@@ -1,0 +1,192 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore how NHCS’s Singapore Cardiac Data Bank improves heart care through data and research, including EuroHeart collaboration.">
+  <title>Our Data - NHCS</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="accessibility-controls">
+    <button onclick="increaseFont()">A+</button>
+    <button onclick="decreaseFont()">A-</button>
+    <button onclick="toggleContrast()">Contrast</button>
+  </div>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">SCDB</a>
+      <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="scdb.html">Our Data</a></li>
+        <li><a href="singcloud.html">SingCLOUD</a></li>
+        <li><a href="publications.html">Publications</a></li>
+        <li><a href="contact.html">Connect</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="content-section">
+    <h2>Research for Better Hearts</h2>
+    <p>Our team works with data and science to find new ways to prevent and treat heart disease.</p>
+    <img src="research.jpg" alt="Research lab" class="section-img">
+    <div class="content-grid">
+      <div class="content-card">
+        <h3>Data Analysis</h3>
+        <p>Using data to improve heart care.</p>
+      </div>
+      <div class="content-card">
+        <h3>Global Collaboration</h3>
+        <p>Working with experts worldwide.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="content-section">
+    <h2>Our Heart Data</h2>
+    <p>Since 2000, our Singapore Cardiac Data Bank has collected information on heart treatments to help doctors save lives.</p>
+    <img src="cardiac_data.png" alt="Heart data visualization" class="section-img">
+    <div class="dashboard-container">
+      <h3>Explore Our Data</h3>
+      <select id="data-filter" onchange="updateChart()">
+        <option value="all">All Institutions</option>
+        <option value="nhcs">NHCS</option>
+        <option value="sgh">SGH</option>
+        <option value="cgh">CGH</option>
+        <option value="skh">SKH</option>
+        <option value="nuhcs">NUHCS</option>
+        <option value="ntfgh">NTFGH</option>
+        <option value="ah">AH</option>
+        <option value="ttsh">TTSH</option>
+        <option value="ktph">KTPH</option>
+        <option value="wh">WH</option>
+      </select>
+      <canvas id="data-chart"></canvas>
+    </div>
+  </section>
+
+  <section class="content-section" id="reports">
+    <h2>Annual Reports</h2>
+    <p>Explore our yearly insights on heart health advancements through the Singapore Cardiac Data Bank.</p>
+    <div class="reports-grid">
+      <div class="report-card">
+        <h3>Cath/PCI</h3>
+        <img src="cath_pci.png" alt="Catheterization procedure" class="report-img">
+        <p>Reports on catheterization and percutaneous coronary intervention, detailing procedures and outcomes.</p>
+        <a href="#" class="cta-button">Download 2024 Report</a>
+      </div>
+      <div class="report-card">
+        <h3>Heart Failure</h3>
+        <img src="chf.png" alt="Heart failure research" class="report-img">
+        <p>Insights into heart failure treatments, patient care, and research progress.</p>
+        <a href="#" class="cta-button">Download 2024 Report</a>
+      </div>
+      <div class="report-card">
+        <h3>EPS/ICD/PPM</h3>
+        <img src="ppm.png" alt="Electrophysiology lab" class="report-img">
+        <p>Data on electrophysiology, implantable defibrillators, and pacemakers for heart rhythm management.</p>
+        <a href="#" class="cta-button">Download 2024 Report</a>
+      </div>
+      <div class="report-card">
+        <h3>TAVI</h3>
+        <img src="tavi2.png" alt="TAVI procedure" class="report-img"">
+        <p>Updates on transcatheter aortic valve implantation, improving valve disease treatment.</p>
+        <a href="#" class="cta-button">Download 2024 Report</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <h2>EuroHeart Collaboration</h2>
+    <p>EuroHeart, an initiative led by the European Society of Cardiology, aims to enhance cardiovascular care through standardized data collection and international collaboration. Launched in 2019, it began with a pilot phase (2019–2021) to test feasibility across multiple countries, followed by a consolidation phase (2022–2024) to expand its network and develop a Data Science Centre for advanced analytics. By fostering harmonized patient data registries, EuroHeart drives quality improvement and supports registry-based clinical trials.</p><br><br>
+    <h3>2024 Report Highlights</h3>
+    <p>The EuroHeart 2024 Report analyzes data from 63,961 patients across eight countries, including Singapore. Notably, Singapore demonstrates high reperfusion rates for ST-elevation myocardial infarction (STEMI), with 92% of patients receiving timely treatment, surpassing many European counterparts (Page 13).</p><br><br>
+    <p>
+      <a href="https://www.escardio.org/static-file/Escardio/Research/Euroheart/EuroHeart_Report2024.pdf" class="cta-button" target="_blank" download onclick="trackDownload('EuroHeart_Report2024.pdf')">Download EuroHeart 2024 Report</a>
+    </p><br>    <h3>Report Preview</h3>
+    <p>
+      <a href="https://www.escardio.org/static-file/Escardio/Research/Euroheart/EuroHeart_Report2024.pdf" target="_blank">
+        <img src="euroheart_cover.png" alt="EuroHeart 2024 Report Cover" class="report-thumbnail">
+      </a>
+    </p>
+    <button class="cta-button toggle-viewer" onclick="toggleViewer()">Show Report Preview</button><br><br>
+    <div class="pdf-viewer" style="display: none;">
+      <iframe src="https://www.escardio.org/static-file/Escardio/Research/Euroheart/EuroHeart_Report2024.pdf" class="pdf-iframe" title="EuroHeart 2024 Report Preview"></iframe>
+      <p class="pdf-fallback">Your browser does not support PDF viewing. <a href="https://www.escardio.org/static-file/Escardio/Research/Euroheart/EuroHeart_Report2024.pdf" target="_blank">Download the report</a>.</p>
+    </div>
+    <h3>Domains</h3>
+    <div class="domains-grid">
+      <div class="domain-card" data-animation-delay="0.2s">
+        <img src="cath_pci.png" alt="Catheterization procedure" class="domain-img">
+        <h3>ACS-PCI</h3>
+        <p>Focuses on acute coronary syndrome and percutaneous coronary intervention to improve treatment outcomes.</p>
+      </div>
+      <div class="domain-card" data-animation-delay="0.4s">
+        <img src="chf.png" alt="Heart failure research" class="domain-img">
+        <h3>Heart Failure</h3>
+        <p>Enhances care through data-driven insights into heart failure management.</p>
+      </div>
+      <div class="domain-card" data-animation-delay="0.6s">
+        <img src="AF4.png" alt="Electrophysiology lab" class="domain-img">
+        <h3>Atrial Fibrillation</h3>
+        <p>Aims to standardize data for better diagnosis and treatment of irregular heart rhythms.</p>
+      </div>
+      <div class="domain-card" data-animation-delay="0.8s">
+        <img src="tavi2.png" alt="TAVI procedure" class="domain-img">
+        <h3>TAVI</h3>
+        <p>Supports advancements in transcatheter aortic valve implantation for valve disease.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>© 2025 National Heart Centre Singapore. <a href="contact.html">Connect With Us</a> | <a href="privacy.html">Privacy Policy</a></p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="scripts.js"></script>
+</body>
+</html>
