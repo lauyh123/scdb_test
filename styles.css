@@ -443,10 +443,12 @@ body {
 .accessibility-controls {
   position: fixed;
   top: 20px;
-  right: 20px;
+  left: 30px;
   display: flex;
-  gap: 1rem;
+  flex-direction:column;
+  gap: 0.3 rem;
   z-index: 1100;
+  
 }
 
 .accessibility-controls button {
@@ -455,7 +457,7 @@ body {
   padding: 0.6rem 1rem;
   cursor: pointer;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.8rem;
   transition: background 0.3s ease;
 }
 
